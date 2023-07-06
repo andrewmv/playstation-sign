@@ -1,0 +1,117 @@
+# PlayStation Sign Controller
+# Andrew Villeneuve 2023
+# v1.0
+
+### PIN MAPPINGS - BOARD NODEMCUV2
+# D1/GPIO5 - Square, wifi status
+# D2/GPIO4 - Cross
+# D5/GPIO14 - Circle
+# D6/GPIO12 - Triangle
+# D3/GPIO0 - Mode button, bootsel
+
+esphome:
+  name: playstation_sign
+
+esp8266:
+  board: nodemcuv2
+
+preferences:
+  flash_write_interval: 5min
+
+wifi:
+  ssid: !secret ssid  
+  password: !secret wappw
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: playstation_sign_fallback
+    password: !secret hotspotpw  
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret apipw
+
+ota:
+  password: !secret apipw
+
+### BEGIN GOOD STUFF ###
+
+status_led:
+  pin:
+    inverted: True
+    number: GPIO2
+
+output:
+  - platform: esp8266_pwm
+    pin: GPIO5
+    id: output_square
+  - platform: esp8266_pwm
+    pin: GPIO4
+    id: output_cross
+  - platform: esp8266_pwm
+    pin: GPIO14
+    id: output_circle
+  - platform: esp8266_pwm
+    pin: GPIO12
+    id: output_triangle
+
+light:
+  - platform: monochromatic
+    name: "Playstation Square"
+    id: playstation_square
+    output: output_square
+    icon: "mdi:square-outline"
+  - platform: monochromatic
+    name: "Playstation Cross"
+    id: playstation_cross
+    output: output_cross
+    icon: "mdi:window-close"
+  - platform: monochromatic
+    name: "Playstation Circle"
+    id: playstation_circle
+    output: output_circle
+    icon: "mdi:circle-outline"
+  - platform: monochromatic
+    name: "Playstation Triangle"
+    id: playstation_triangle
+    output: output_triangle
+    icon: "mdi:triangle-outline"
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: power_button
+    internal: true
+    on_press:
+      - if:
+          condition:
+            or:
+              - light.is_on: playstation_square
+              - light.is_on: playstation_cross
+              - light.is_on: playstation_circle
+              - light.is_on: playstation_triangle
+          then:
+            - light.turn_off: playstation_square
+            - light.turn_off: playstation_cross
+            - light.turn_off: playstation_circle
+            - light.turn_off: playstation_triangle
+          else:
+            - light.turn_on: 
+                id: playstation_square
+                brightness: 100%
+            - light.turn_on: 
+                id: playstation_cross
+                brightness: 100%
+            - light.turn_on: 
+                id: playstation_circle
+                brightness: 100%
+            - light.turn_on: 
+                id: playstation_triangle
+                brightness: 100%
