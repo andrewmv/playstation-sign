@@ -3,7 +3,7 @@
 # v1.0
 
 ### PIN MAPPINGS - BOARD NODEMCUV2
-# D1/GPIO5 - Square, wifi status
+# D1/GPIO5 - Square
 # D2/GPIO4 - Cross
 # D5/GPIO14 - Circle
 # D6/GPIO12 - Triangle
@@ -26,6 +26,8 @@ wifi:
     ssid: playstation_sign_fallback
     password: !secret hotspotpw  
 
+captive_portal:
+
 # Enable logging
 logger:
 
@@ -38,10 +40,10 @@ ota:
 
 ### BEGIN GOOD STUFF ###
 
-status_led:
-  pin:
-    inverted: True
-    number: GPIO2
+# status_led:
+#   pin:
+#     inverted: False
+#     number: GPIO12
 
 output:
   - platform: esp8266_pwm
