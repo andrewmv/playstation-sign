@@ -28,6 +28,8 @@ wifi:
 
 captive_portal:
 
+web_server:
+  
 # Enable logging
 logger:
 
